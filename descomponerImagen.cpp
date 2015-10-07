@@ -67,11 +67,11 @@ int main (int argc, char* argv[])
 	std::string path = ruta.substr(ruta.find("IMG"), ruta.length()) + "/" + imagen;
 	std::cout << path << std::endl;
 
-	_img = cv::imread("IMG/NEURONAS/PNNs_granular_condicionamiento/RECORTADAS/F8C1/corte 1 lob3 40x2.5 foto1_2 CONDICIONADO.tif" /*path*/, cv::IMREAD_ANYCOLOR | cv::IMREAD_ANYDEPTH);
+	_img = cv::imread("../IMG/NEURONAS/PNNs_granular_condicionamiento/RECORTADAS/F8C1/corte 1 lob3 40x2.5 foto1_2 CONDICIONADO.tif"/*path*/, cv::IMREAD_ANYCOLOR | cv::IMREAD_ANYDEPTH);
 	creaVectorImagen(_img.rows, _img.cols);
 
 	cv::imshow("Neuronas", _img);
-    
+
 	cv::waitKey(0);
 
 	rellenaVectorImagen();
@@ -214,8 +214,13 @@ void rellenaMiHistograma(MiHistograma &mh)
 {
 	for (int i = 0; i < _centers.rows; i++)
 	{
+		float vCoordenadas[_centers.cols];
 		for (int j = 0; j < _centers.cols; j++)
-			mh.getCluster(i).centroide.at<float>(j) = _centers.at<float>(i,j);
+		{
+			vCoordenadas[j] = _centers.at<float>(i,j);
+			//mh.getCluster(i).centroide.at<float>(j) = _centers.at<float>(i,j);
+		}
+		mh.setCoordenadasCentroide(i, vCoordenadas);
 	}
 	for (int i = 0; i < _vCluster.rows; i++)
 		mh.setTotalPuntos(_vCluster.at<ushort>(i), mh.getCluster(_vCluster.at<ushort>(i)).getTotalPuntos() + 1);
