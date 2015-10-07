@@ -7,6 +7,6 @@ For compile, you need say it the path of Opencv and others external libs:
  -I/home/usuario/NEURONAS/neuronal-study  -->> for head of includes
 
 
-For run the program:
+For run program:
  it need the path of file-path
  i.e. ./prueba1 ../rutas/totalSalina.txt
