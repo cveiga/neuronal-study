@@ -4,10 +4,10 @@
 
 ushort ** _vImage;
 ushort ** _vPoints;
-//int _vCluster[NCLUSTER];
+
 cv::Mat _vCluster;
 cv::Mat _img;
-cv::Mat _centers;	//(NCLUSTER, 1, CV_32FC1);
+cv::Mat _centers;
 
 
 void creaVectorImagen(int fila, int columna);
@@ -76,15 +76,6 @@ int main (int argc, char* argv[])
 			rellenaVectorPuntos(cont++, f, c, data);
 		}
 	}
-	/*for (int i = 0; i < (_img.rows - 1) * (_img.cols - 1); i++)
-	{
-		std::cout << "[";
-		for (int j = 0; j < 9; j++)
-			std::cout << "," << data.at<float>(i,j) << " ";
-		std::cout  << "]" << std::endl;
-		if(i == 40) cv::waitKey(0);
-	}
-	cv::waitKey(0);*/
 
 	std::cout << "TOTAL: " << cont << std::endl;
 
@@ -98,14 +89,11 @@ int main (int argc, char* argv[])
 
 	std::cout << "Filas de _centers: " << _centers.rows << ", Columnas de _centers: " << _centers.cols << std::endl;
 	std::cout << "Filas de _vCluster: " << _vCluster.rows << ", Columnas de _vCluster: " << _vCluster.cols << std::endl;
-	//std::cout << "Filas de indices: " << indices.rows << ", Columnas de indices: " << indices.cols << std::endl;
-	//std::cout << "Filas de dists: " << dists.rows << ", Columnas de dists: " << dists.cols << std::endl;
 
-	//MiHistograma mHisto(NCLUSTER, _centers.cols, cv::Mat(1,_centers.cols, CV_32FC1));
 	MiHistograma mHisto(NCLUSTER, _centers.cols);
 	rellenaMiHistograma(mHisto);
 	mHisto.imprimeHistograma();
-	cv::waitKey(0);
+	/*cv::waitKey(0);
 	for(int i = 0; i < _centers.rows; i++)
 	{
 		std::cout << "   " << i+1 << "\t  ===>  ";
@@ -114,11 +102,11 @@ int main (int argc, char* argv[])
 			std::cout << " [" << _centers.at<float>(i,j) << "] -";
 		}
 		std::cout << std::endl;
-	}
+	}*/
 
 	//imprimeVCluster();
 	//muestraHistograma();
-	std::cout << (int)compactness << std::endl;
+	std::cout << "Total De Totales: " << mHisto.getTotaltes() << std::endl;
 
 	eliminaVectorImagen();
 	eliminaVectorPuntos();
@@ -158,11 +146,8 @@ void rellenaVectorImagen()
 		if (mostrar)
 		{
 			for(int fila = 0; fila < _img.rows; fila++)
-			{
-				numerito = _img.at<ushort>(fila, columna) < 256 ? _img.at<ushort>(fila, columna) : _img.at<ushort>(fila, columna)/256;
-				_vImage[fila][j] = numerito;
-				//std::cout << numerito  << ", ";
-			}
+				_vImage[fila][j] = _img.at<ushort>(fila, columna) < 256 ? _img.at<ushort>(fila, columna) : _img.at<ushort>(fila, columna)/256;   /**normalización de datos fuera del rango de 0 a 255 */
+
 			j++;
 			columna++;
 			mostrado++;
@@ -183,6 +168,7 @@ void rellenaVectorImagen()
 	}
 }
 
+/** En esta función se almacenan el valor de cada uno de los puntos de 9 pixeles resultantes de aplicar una mascara de 3x3 */
 void rellenaVectorPuntos(int fila, int f, int c, cv::Mat data)
 {
 	data.at<float>(fila, 0) = _vPoints[fila][0] = _vImage[f - 1][c - 1];
