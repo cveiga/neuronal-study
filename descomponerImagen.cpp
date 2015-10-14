@@ -17,7 +17,7 @@ void rellenaVectorPuntos(int fila, int f, int c, cv::Mat);
 void rellenaMiHistograma(MiHistograma &mh);
 void imprimeVectorImagen();
 void imprimeVCluster();
-void muestraHistograma();
+//void muestraHistograma();
 void eliminaVectorImagen();
 void eliminaVectorPuntos();
 
@@ -93,6 +93,7 @@ int main (int argc, char* argv[])
 	MiHistograma mHisto(NCLUSTER, _centers.cols);
 	rellenaMiHistograma(mHisto);
 	mHisto.imprimeHistograma();
+	mHisto.saveHistograma();
 	/*cv::waitKey(0);
 	for(int i = 0; i < _centers.rows; i++)
 	{
@@ -104,8 +105,6 @@ int main (int argc, char* argv[])
 		std::cout << std::endl;
 	}*/
 
-	//imprimeVCluster();
-	//muestraHistograma();
 	std::cout << "Total De Totales: " << mHisto.getTotaltes() << std::endl;
 
 	eliminaVectorImagen();
@@ -225,7 +224,7 @@ void imprimeVCluster()
 	}
 }
 
-void muestraHistograma()
+/*void muestraHistograma()
 {
  	/// Establish the number of bins
   	int histSize = 100;
@@ -266,7 +265,7 @@ void muestraHistograma()
 	cv::imshow("calcHist Demo", histImage );
 
 	cv::waitKey(0);
-}
+}*/
 
 void eliminaVectorImagen()
 {

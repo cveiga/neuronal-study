@@ -6,8 +6,18 @@
 class Cluster
 {
 private:
+	friend std::ostream & operator<<(std::ostream &os, const Cluster &cl);
+	friend class boost::serialization::access;
+	template<class Archive>
+	void serialize(Archive & ar, const unsigned int version/* file_version */)
+	{ 
+		for (int i = 0; i < 9; i++)
+			ar & centroide[i];
+		ar & total_puntos;
+	}
+
 	/*cv::Mat*/float* centroide;
-	int total_puntos;
+	int total_puntos;	
 
 public:
 	Cluster(): total_puntos(0) {}
@@ -31,5 +41,13 @@ public:
 
 	~Cluster(){}
 };
+
+std::ostream & operator<<(std::ostream &os, const Cluster &cl)
+{
+	for (int i = 0; i < 9; i++)
+			os << cl.centroide[i];
+		
+    return os << cl.total_puntos;
+}
 
 #endif

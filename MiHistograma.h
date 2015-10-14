@@ -40,6 +40,29 @@ class MiHistograma : public Cluster
 		}
 		void setTotalPuntos(const int i, const int tp){ vCluster[i].setTotalPuntos(tp); }
 		void setCoordenadasCentroide(const int i, const float vCoordenadas[]) { vCluster[i].setCoordenadasCentroide(vCoordenadas);	}
+		bool saveHistograma(){
+			//creo y abro un fichero de caracteres para la salida
+			//std::ofstream ofs("filename.dat", std::ios::binary);
+			std::ofstream ofs("pruebaGuardar.txt");	//modificar para abrir con cursor a final de fichero o abrir en programa principal
+
+			boost::archive::text_oarchive oa(ofs);
+			//escriblo la instancia de la clase en el archivo
+			for (int i = 0; i < tamanyo; i++){
+				oa << vCluster[i];
+			}
+	
+			//el archivo y el stream se cierran cuando se llama al constructor
+			return true;
+		}
+
+		bool readHistograma(std::ifstream &ifs)
+		{
+			boost::archive::text_iarchive ia(ifs);
+
+			for(int i = 0; i < tamanyo; i++)
+				ia >> vCluster[i];
+			return true;
+		}
 
 		~MiHistograma()
 		{ 
