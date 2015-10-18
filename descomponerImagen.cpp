@@ -2,8 +2,8 @@
 
 #define NCLUSTER 100
 
-ushort ** _vImage;
-ushort ** _vPoints;
+ushort ** _vImage = NULL;
+ushort ** _vPoints = NULL;
 
 cv::Mat _vCluster;
 cv::Mat _img;
@@ -41,71 +41,88 @@ int main (int argc, char* argv[])
 	std::string imagen;
 
 	getline(fich, ruta);
-	getline(fich, imagen);
 
-	std::cout << "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" << std::endl;
-	std::cout << ruta << std::endl;
+	long posicion = fich.tellg();;
+	char basura;
+
+	do{
+		fich.seekg(posicion, fich.beg);
+		getline(fich, imagen);
+
+		if (!imagen.find("/"))	//nueva ruta de acceso a las imágenes
+		{
+			ruta = imagen;
+			getline(fich, imagen);
+		}
+
+		std::cout << "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" << std::endl;
+		std::cout << ruta << std::endl;
+
+		cv::namedWindow(imagen.substr(0, imagen.find(".png")), cv::WINDOW_AUTOSIZE);
+		
+		const std::string & path = "../" + ruta.substr(ruta.find("IMG"), ruta.length()) + "/" + imagen;
+		std::cout << "PATH: " << path << std::endl;
+
+		_img = cv::imread(path, cv::IMREAD_ANYCOLOR | cv::IMREAD_ANYDEPTH);
+		if (_vImage == NULL) creaVectorImagen(_img.rows, _img.cols);
+
+		cv::imshow(imagen.substr(0, imagen.find(".png")), _img);
+		std::cout << "NO LLEGA" << std::endl;
+
+		cv::waitKey(1);
+
+		rellenaVectorImagen();
+
+		std::cout << _img.dims << std::endl;
+
+		/** 9 columnas, por que utilizamos una mascara de 3x3, que genera 9 coordenadas por cada pixel
+		**  los pixeles de los extremos se descartan */
+		cv::Mat data = cv::Mat::zeros((_img.rows - 1) * (_img.cols - 1), 9, CV_32FC1);
+		if (_vPoints == NULL) creaVectorPuntos((_img.rows - 1) * (_img.cols - 1), 9);
+
+		int cont = 0;
+		for (int f = 1; f < 399; f++){
+			for (int c = 1; c < 399; c++)
+			{
+				rellenaVectorPuntos(cont++, f, c, data);
+			}
+		}
+
+		std::cout << "TOTAL: " << cont << std::endl;
+
+		//imprimeVectorImagen();
+		//cv::Mat indices, dists;
+		double * dists;
+		double compactness = cv::kmeans(data, NCLUSTER, _vCluster, cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 10, 0.01), 3, cv::KMEANS_PP_CENTERS, _centers);
+		//cv::parallel_for_(cv::Range(0, NCLUSTER), KMeansDistanceComputer(dists, _vCluster, data, _centers));
+		//cv::ParallelLoopBody::kmeansPPDistanceComputer();
+		//int::knnSearch(data, indices, dists, NCLUSTER, 32);
+
+		std::cout << "Filas de _centers: " << _centers.rows << ", Columnas de _centers: " << _centers.cols << std::endl;
+		std::cout << "Filas de _vCluster: " << _vCluster.rows << ", Columnas de _vCluster: " << _vCluster.cols << std::endl;
+
+		MiHistograma mHisto(NCLUSTER, _centers.cols);
+		rellenaMiHistograma(mHisto);
+		mHisto.imprimeHistograma();
+		mHisto.saveHistograma();
+		/*cv::waitKey(0);
+		for(int i = 0; i < _centers.rows; i++)
+		{
+			std::cout << "   " << i+1 << "\t  ===>  ";
+			for (int j = 0; j < _centers.cols; j++)
+			{
+				std::cout << " [" << _centers.at<float>(i,j) << "] -";
+			}
+			std::cout << std::endl;
+		}*/
+		cv::destroyWindow(imagen.substr(0, imagen.find(".png")));
+
+		posicion = fich.tellg();
+		fich >> basura;
+	} while (!fich.eof());
+	//std::cout << "Total De Totales: " << mHisto.getTotaltes() << std::endl;
 
 	fich.close();
-
-	cv::namedWindow("Neuronas", cv::WINDOW_AUTOSIZE);
-	
-	std::string path = ruta.substr(ruta.find("IMG"), ruta.length()) + "/" + imagen;
-	std::cout << path << std::endl;
-
-	_img = cv::imread("../IMG/NEURONAS/PNNs_granular_condicionamiento/RECORTADAS/F8C1/corte 1 lob3 40x2.5 foto1_2 CONDICIONADO.tif"/*path*/, cv::IMREAD_ANYCOLOR | cv::IMREAD_ANYDEPTH);
-	creaVectorImagen(_img.rows, _img.cols);
-
-	cv::imshow("Neuronas", _img);
-
-	cv::waitKey(0);
-
-	rellenaVectorImagen();
-
-	std::cout << _img.dims << std::endl;
-
-	/** 9 columnas, por que utilizamos una mascara de 3x3, que genera 9 coordenadas por cada pixel
-	**  los pixeles de los extremos se descartan */
-	cv::Mat data = cv::Mat::zeros((_img.rows - 1) * (_img.cols - 1), 9, CV_32FC1);
-	creaVectorPuntos((_img.rows - 1) * (_img.cols - 1), 9);
-
-	int cont = 0;
-	for (int f = 1; f < 399; f++){
-		for (int c = 1; c < 399; c++)
-		{
-			rellenaVectorPuntos(cont++, f, c, data);
-		}
-	}
-
-	std::cout << "TOTAL: " << cont << std::endl;
-
-	//imprimeVectorImagen();
-	//cv::Mat indices, dists;
-	double * dists;
-	double compactness = cv::kmeans(data, NCLUSTER, _vCluster, cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 10, 0.01), 3, cv::KMEANS_PP_CENTERS, _centers);
-	//cv::parallel_for_(cv::Range(0, NCLUSTER), KMeansDistanceComputer(dists, _vCluster, data, _centers));
-	//cv::ParallelLoopBody::kmeansPPDistanceComputer();
-	//int::knnSearch(data, indices, dists, NCLUSTER, 32);
-
-	std::cout << "Filas de _centers: " << _centers.rows << ", Columnas de _centers: " << _centers.cols << std::endl;
-	std::cout << "Filas de _vCluster: " << _vCluster.rows << ", Columnas de _vCluster: " << _vCluster.cols << std::endl;
-
-	MiHistograma mHisto(NCLUSTER, _centers.cols);
-	rellenaMiHistograma(mHisto);
-	mHisto.imprimeHistograma();
-	mHisto.saveHistograma();
-	/*cv::waitKey(0);
-	for(int i = 0; i < _centers.rows; i++)
-	{
-		std::cout << "   " << i+1 << "\t  ===>  ";
-		for (int j = 0; j < _centers.cols; j++)
-		{
-			std::cout << " [" << _centers.at<float>(i,j) << "] -";
-		}
-		std::cout << std::endl;
-	}*/
-
-	std::cout << "Total De Totales: " << mHisto.getTotaltes() << std::endl;
 
 	eliminaVectorImagen();
 	eliminaVectorPuntos();

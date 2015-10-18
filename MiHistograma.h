@@ -43,7 +43,7 @@ class MiHistograma : public Cluster
 		bool saveHistograma(){
 			//creo y abro un fichero de caracteres para la salida
 			//std::ofstream ofs("filename.dat", std::ios::binary);
-			std::ofstream ofs("pruebaGuardar.txt");	//modificar para abrir con cursor a final de fichero o abrir en programa principal
+			std::ofstream ofs("pruebaGuardar.txt", std::ios::app);	//abre con cursor a final de fichero
 
 			boost::archive::text_oarchive oa(ofs);
 			//escriblo la instancia de la clase en el archivo
@@ -51,7 +51,7 @@ class MiHistograma : public Cluster
 				oa << vCluster[i];
 			}
 	
-			//el archivo y el stream se cierran cuando se llama al constructor
+			//el archivo y el stream se cierran cuando se llama al destructor
 			return true;
 		}
 
