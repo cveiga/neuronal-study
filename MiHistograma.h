@@ -7,10 +7,11 @@ class MiHistograma : public Cluster
 {
 	private:
 		Cluster* vCluster;
+		std::string tipo;
 		ushort tamanyo, num_coordenadas;
 	public:
 		MiHistograma(){}
-		MiHistograma(ushort tam, ushort nc): tamanyo(tam), num_coordenadas(nc)
+		MiHistograma(ushort tam, ushort nc, std::string tp): tamanyo(tam), num_coordenadas(nc), tipo(tp)
 		{ 
 			vCluster = new Cluster[tamanyo];
 			for (int i = 0; i < tamanyo; i++)
@@ -31,12 +32,16 @@ class MiHistograma : public Cluster
 
 		void imprimeHistograma() 
 		{ 
+			std::cout << "|||||||||||||||||||||||||||||||||" << std::endl;
+			std::cout << "| TIPO DE NEURONA: " << tipo << "\t|"<< std::endl;
+			std::cout << "|||||||||||||||||||||||||||||||||" << std::endl;
 			for (int i = 0; i < tamanyo; i++)
 			{
 				std::cout << "   " << i+1 << "\t  ===> Cantidad:  " << vCluster[i].getTotalPuntos();
 				vCluster[i].imprimeCentroide(num_coordenadas);
 				std::cout << std::endl;
 			}
+			std::cout << std::endl;
 		}
 		void setTotalPuntos(const int i, const int tp){ vCluster[i].setTotalPuntos(tp); }
 		void setCoordenadasCentroide(const int i, const float vCoordenadas[]) { vCluster[i].setCoordenadasCentroide(vCoordenadas);	}
@@ -44,7 +49,7 @@ class MiHistograma : public Cluster
 			//creo y abro un fichero de caracteres para la salida
 			//std::ofstream ofs("filename.dat", std::ios::binary);
 			std::ofstream ofs("pruebaGuardar.txt", std::ios::app);	//abre con cursor a final de fichero
-
+			ofs << tipo.substr(1, tipo.size()) << std::endl;
 			boost::archive::text_oarchive oa(ofs);
 			//escriblo la instancia de la clase en el archivo
 			for (int i = 0; i < tamanyo; i++){
@@ -57,6 +62,8 @@ class MiHistograma : public Cluster
 
 		bool readHistograma(std::ifstream &ifs)
 		{
+			ifs >> tipo;
+
 			boost::archive::text_iarchive ia(ifs);
 
 			for(int i = 0; i < tamanyo; i++)

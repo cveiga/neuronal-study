@@ -58,7 +58,9 @@ int main (int argc, char* argv[])
 		std::cout << "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" << std::endl;
 		std::cout << ruta << std::endl;
 
-		cv::namedWindow(imagen.substr(0, imagen.find(".png")), cv::WINDOW_AUTOSIZE);
+		std::string nameImage = imagen.substr(0, imagen.size()-4);	//imagen.find(".png"));
+		cv::namedWindow(imagen.substr(0, imagen.size()-4), cv::WINDOW_AUTOSIZE);
+		//cv::namedWindow(imagen.substr(0, imagen.find(".png")), cv::WINDOW_AUTOSIZE);
 		
 		const std::string & path = "../" + ruta.substr(ruta.find("IMG"), ruta.length()) + "/" + imagen;
 		std::cout << "PATH: " << path << std::endl;
@@ -66,7 +68,8 @@ int main (int argc, char* argv[])
 		_img = cv::imread(path, cv::IMREAD_ANYCOLOR | cv::IMREAD_ANYDEPTH);
 		if (_vImage == NULL) creaVectorImagen(_img.rows, _img.cols);
 
-		cv::imshow(imagen.substr(0, imagen.find(".png")), _img);
+		//cv::imshow(imagen.substr(0, imagen.find(".png")), _img);
+		cv::imshow(imagen.substr(0, imagen.size()-4), _img);
 		std::cout << "NO LLEGA" << std::endl;
 
 		cv::waitKey(1);
@@ -89,7 +92,8 @@ int main (int argc, char* argv[])
 		}
 
 		std::cout << "TOTAL: " << cont << std::endl;
-
+		//std::cout << "TIPO: -> " << imagen.substr(imagen.find_last_of(" "), imagen.find(".png")) << std::endl;
+		std::cout << "TIPO: -> " << nameImage.substr(nameImage.find_last_of(" "), nameImage.size()) << std::endl;
 		//imprimeVectorImagen();
 		//cv::Mat indices, dists;
 		double * dists;
@@ -101,7 +105,7 @@ int main (int argc, char* argv[])
 		std::cout << "Filas de _centers: " << _centers.rows << ", Columnas de _centers: " << _centers.cols << std::endl;
 		std::cout << "Filas de _vCluster: " << _vCluster.rows << ", Columnas de _vCluster: " << _vCluster.cols << std::endl;
 
-		MiHistograma mHisto(NCLUSTER, _centers.cols);
+		MiHistograma mHisto(NCLUSTER, _centers.cols, nameImage.substr(nameImage.find_last_of(" "), nameImage.size()));
 		rellenaMiHistograma(mHisto);
 		mHisto.imprimeHistograma();
 		mHisto.saveHistograma();
@@ -115,7 +119,8 @@ int main (int argc, char* argv[])
 			}
 			std::cout << std::endl;
 		}*/
-		cv::destroyWindow(imagen.substr(0, imagen.find(".png")));
+		//cv::destroyWindow(imagen.substr(0, imagen.find(".png")));
+		cv::destroyWindow(imagen.substr(0, imagen.size()-4));
 
 		posicion = fich.tellg();
 		fich >> basura;

@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[])
 {
-	MiHistograma mHisto(100, 9);
+	MiHistograma mHisto(100, 9, "");
 	
 	std::ifstream ifs("pruebaGuardar.txt");
 

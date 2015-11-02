@@ -36,7 +36,7 @@ public:
 	{
 		std::cout << "\t";
 		for (int i = 0; i < num_coordenadas; i++)
-			std::cout << " [" << /*centroide.at<float>(i,j)*/ centroide[i] << "] -";
+			std::cout << "[" << /*centroide.at<float>(i,j)*/ centroide[i] << "]-";
 	}
 
 	~Cluster(){}
