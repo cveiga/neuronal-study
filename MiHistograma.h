@@ -22,6 +22,7 @@ class MiHistograma : public Cluster
 		Cluster getCluster(int i) { return vCluster[i]; }
 		ushort getTam() const { return tamanyo; }
 		ushort getNumCoordenadas() const { return num_coordenadas; }
+		std::string getTipo() const{ return tipo; }
 		int getTotaltes() const
 		{
 			int total = 0;

@@ -24,6 +24,7 @@ public:
 	Cluster(int num_coordenadas): total_puntos(0) { centroide = new float[num_coordenadas]; } /*centroide = (1, num_coordenadas, CV_32FC1);*/
 	int getTotalPuntos() const { return total_puntos; }
 	void setTotalPuntos(const int tp) { total_puntos = tp; }
+	float* getCoordenadasCentroide() const { return centroide; }
 	void setCoordenadasCentroide(const float vectorCoordenadas[]) 
 	{
 		for (int i = 0; i <= sizeof(vectorCoordenadas); i++)
