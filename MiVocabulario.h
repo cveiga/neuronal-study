@@ -1,17 +1,17 @@
-#ifndef MIHISTOGRAMA_H
-#define MIHISTOGRAMA_H
+#ifndef MIVOCABULARIO_H
+#define MIVOCABULARIO_H
 
 #include "Cluster.h"
 
-class MiHistograma : public Cluster
+class MiVocabulario : public Cluster
 {
 	private:
 		Cluster* vCluster;
 		std::string tipo;
 		ushort tamanyo, num_coordenadas;
 	public:
-		MiHistograma(){}
-		MiHistograma(ushort tam, ushort nc, std::string tp): tamanyo(tam), num_coordenadas(nc), tipo(tp)
+		MiVocabulario(){}
+		MiVocabulario(ushort tam, ushort nc, std::string tp = " "): tamanyo(tam), num_coordenadas(nc), tipo(tp)
 		{ 
 			vCluster = new Cluster[tamanyo];
 			for (int i = 0; i < tamanyo; i++)
@@ -23,30 +23,30 @@ class MiHistograma : public Cluster
 		ushort getTam() const { return tamanyo; }
 		ushort getNumCoordenadas() const { return num_coordenadas; }
 		std::string getTipo() const{ return tipo; }
-		int getTotaltes() const
+		/*int getTotaltes() const
 		{
 			int total = 0;
 			for (int i = 0; i < tamanyo; i++)
 				total += vCluster[i].getTotalPuntos();
 			return total;
-		}
+		}*/
 
-		void imprimeHistograma() 
+		void imprimeVocabulario() 
 		{ 
 			std::cout << "|||||||||||||||||||||||||||||||||" << std::endl;
-			std::cout << "| TIPO DE NEURONA: " << tipo << "\t|"<< std::endl;
+			std::cout << "| VOCABULARIO DEL TIPO: " << tipo << "\t|"<< std::endl;
 			std::cout << "|||||||||||||||||||||||||||||||||" << std::endl;
 			for (int i = 0; i < tamanyo; i++)
 			{
-				std::cout << "   " << i+1 << "\t  ===> Cantidad:  " << vCluster[i].getTotalPuntos();
+				std::cout << "   " << i+1 << "\t  ===> "; 	//Cantidad:  " << vCluster[i].getTotalPuntos();
 				vCluster[i].imprimeCentroide(num_coordenadas);
 				std::cout << std::endl;
 			}
 			std::cout << std::endl;
 		}
-		void setTotalPuntos(const int i, const int tp){ vCluster[i].setTotalPuntos(tp); }
+		//void setTotalPuntos(const int i, const int tp){ vCluster[i].setTotalPuntos(tp); }
 		void setCoordenadasCentroide(const int i, const float vCoordenadas[]) { vCluster[i].setCoordenadasCentroide(vCoordenadas);	}
-		bool saveHistograma(){
+		bool saveVocabulary(){
 			//creo y abro un fichero de caracteres para la salida
 			//std::ofstream ofs("filename.dat", std::ios::binary);
 			std::ofstream ofs("pruebaGuardar.txt", std::ios::app);	//abre con cursor a final de fichero
@@ -61,7 +61,7 @@ class MiHistograma : public Cluster
 			return true;
 		}
 
-		bool readHistograma(std::ifstream &ifs)
+		bool readVocabulary(std::ifstream &ifs)
 		{
 			ifs >> tipo;
 
@@ -72,7 +72,7 @@ class MiHistograma : public Cluster
 			return true;
 		}
 
-		~MiHistograma()
+		~MiVocabulario()
 		{ 
 			for (int i = 0; i < tamanyo; i++) 
 				vCluster[i].~Cluster(); 

@@ -1,8 +1,8 @@
-#include "MiHistograma.h"
+#include "MiVocabulario.h"
 
 int main(int argc, char *argv[])
 {
-	MiHistograma mHisto(100, 9, "");
+	MiVocabulario mVocabu(100, 9, "");
 	
 	std::ifstream ifs("pruebaGuardar.txt");
 
@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
 	{
 		if (posicion != 0) ifs.seekg(posicion, ifs.beg);
 
-		continuar = mHisto.readHistograma(ifs);
-		mHisto.imprimeHistograma();
+		continuar = mVocabu.readVocabulary(ifs);
+		mVocabu.imprimeVocabulario();
 
 		posicion = ifs.tellg();
 		ifs >> basura;

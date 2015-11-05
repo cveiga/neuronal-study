@@ -1,7 +1,7 @@
 #include <math.h>
 #include <head.h>
 
-#include "MiHistograma.h"
+#include "MiVocabulario.h"
 
 #define NCLUSTER 100
 #define NCOORDENADAS 9
@@ -24,8 +24,8 @@ int main(int argc, char * argv[])
 {
 	std::ifstream fichTest(argv[argc-2]);
 
-	MiHistograma mHistoTest(NCLUSTER, NCOORDENADAS, "");
-	MiHistograma mHistoTrainig(NCLUSTER, NCOORDENADAS, "");
+	MiVocabulario mVocabuTest(NCLUSTER, NCOORDENADAS, "");
+	MiVocabulario mVocabuTrainig(NCLUSTER, NCOORDENADAS, "");
 
 	//double **Point_P, **Point_Q, *posicion;
 	double resultado = 0, *vectorPosition;
@@ -52,9 +52,9 @@ int main(int argc, char * argv[])
 		if (posicionTest != 0) fichTest.seekg(posicionTest, fichTest.beg);
 		//if (fichTest.is_open()) std::cout << "Adios" << posicionTest << std::endl;
 
-		mHistoTest.readHistograma(fichTest);
+		mVocabuTest.readVocabulary(fichTest);
 
-		//std::cout << mHistoTest.getTipo() << std::endl;
+		//std::cout << mVocabuTest.getTipo() << std::endl;
 		std::ifstream fichTraining(argv[argc-1]);	//cada imagen de Test que se lee, se leen todas las de training
 		long posicionTraining = 0;
 		char basura2;
@@ -62,15 +62,15 @@ int main(int argc, char * argv[])
 		{		
 			if (posicionTraining != 0) fichTraining.seekg(posicionTraining, fichTraining.beg);
 	
-			mHistoTrainig.readHistograma(fichTraining);
+			mVocabuTrainig.readVocabulary(fichTraining);
 			for (int i = 0; i < NCLUSTER; ++i)	//cada uno de los 100 clusters de la imagen de Test
 			{ 		//coordenadas de cada uno de los 100 centroides de la imagen de Test
-				float *centroideTest = mHistoTest.getCluster(i).getCoordenadasCentroide();
+				float *centroideTest = mVocabuTest.getCluster(i).getCoordenadasCentroide();
 				resultado = 0;
 				min = -1;
 				for (int j = 0; j < NCLUSTER; j++)	//cada uno de los 100 clusters de la imagen de Training
 				{ 		//coordenadas de cada uno de los 100 centroides de la imagen de Test
-					float *centroideTraining = mHistoTrainig.getCluster(j).getCoordenadasCentroide();
+					float *centroideTraining = mVocabuTrainig.getCluster(j).getCoordenadasCentroide();
 				/////////////////////////////////////  DISTANCIA EUCLIDEA  ///////////////////////////////////////
 					for (int k = 0; k < NCOORDENADAS; k++) resultado += pow(centroideTest[k] - centroideTraining[k], 2);
 					//+= pow(Point_P[i][k] - Point_Q[j][k], 2);				
@@ -89,14 +89,14 @@ int main(int argc, char * argv[])
 				for(int i = 0; i < NCOORDENADAS; i++) std::cout << "[" << centroideTest[i] << ",";
 				std::cout << "]" << std::endl;*/
 			}
-			//std::cout << "\t TIPO TRAINING: -> " << mHistoTrainig.getTipo() << std::endl;
+			//std::cout << "\t TIPO TRAINING: -> " << mVocabuTrainig.getTipo() << std::endl;
 
 			posicionTraining = fichTraining.tellg();
 			fichTraining >> basura2	;
 		}
 		fichTraining.close();
 
-		std::cout << "TIPO TEST: -> " << mHistoTest.getTipo() << std::endl;
+		std::cout << "TIPO TEST: -> " << mVocabuTest.getTipo() << std::endl;
 		for (int i = 0; i < NCLUSTER; i++) std::cout << "\t" << i+1 << ": " << vectorPosition[i] << std::endl;
 		std::cout << std::endl << std::endl;
 

@@ -1,6 +1,7 @@
-#include "MiHistograma.h"
+#include "MiVocabulario.h"
+#include <time.h>
 
-#define NCLUSTER 100
+#define NCLUSTER 1000
 
 ushort ** _vImage = NULL;
 ushort ** _vPoints = NULL;
@@ -10,6 +11,7 @@ cv::Mat _img;
 cv::Mat _centers;
 
 int _numeroImagenes;
+time_t _initTime, _endTime;
 
 int cuentaImagenes(char* nomFich);
 std::string leerImagen(std::ifstream &fich, std::string &ruta, std::string &imagen);
@@ -17,7 +19,7 @@ void creaVectorImagen(int fila, int columna);
 void creaVectorPuntos(int fila, int columna);
 void rellenaVectorImagen();
 void rellenaVectorPuntos(int fila, int f, int c, cv::Mat);
-void rellenaMiHistograma(MiHistograma &mh);
+void rellenaMiVocabulario(MiVocabulario &mv);
 void imprimeVectorImagen();
 void imprimeVCluster();
 void eliminaVectorImagen();
@@ -49,15 +51,14 @@ int main (int argc, char* argv[])
 
 	cv::Mat data;
 
-	getline(fich, ruta);
+	//	getline(fich, ruta);
 
-	long posicion = fich.tellg();;
+	long posicion = 0;		//fich.tellg();;
 	char basura;
 	int filaVectorPuntos = 0;
 
-	do{
-		fich.seekg(posicion, fich.beg);
-
+	while (!fich.eof()){
+		if (posicion != 0) fich.seekg(posicion, fich.beg);
 		nameImage = leerImagen(fich, ruta, imagen);
 
 		//cv::namedWindow(imagen.substr(0, imagen.size()-4), cv::WINDOW_AUTOSIZE);
@@ -83,12 +84,7 @@ int main (int argc, char* argv[])
 		std::cout << _img.dims << std::endl;
 
 		for (int f = 1; f < 399; f++)
-		{ 
-			for (int c = 1; c < 399; c++)
-			{
-				rellenaVectorPuntos(filaVectorPuntos++, f, c, data);
-			}
-		}
+			for (int c = 1; c < 399; c++) rellenaVectorPuntos(filaVectorPuntos++, f, c, data);
 
 		std::cout << "TOTAL: " << filaVectorPuntos << std::endl;
 		std::cout << "TIPO: -> " << nameImage.substr(nameImage.find_last_of(" "), nameImage.size()) << std::endl;
@@ -97,17 +93,21 @@ int main (int argc, char* argv[])
 
 		posicion = fich.tellg();
 		fich >> basura;
-	} while (!fich.eof());
-	//std::cout << "Total De Totales: " << mHisto.getTotaltes() << std::endl;
+	}
+	//std::cout << "Total De Totales: " << mVocabu.getTotaltes() << std::endl;
 
 	fich.close();
 
 	double compactness = cv::kmeans(data, NCLUSTER, _vCluster, cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 10, 0.01), 3, cv::KMEANS_PP_CENTERS, _centers);
 
-	MiHistograma mHisto(NCLUSTER, _centers.cols, nameImage.substr(nameImage.find_last_of(" "), nameImage.size()));
-	rellenaMiHistograma(mHisto);
-	mHisto.imprimeHistograma();
-	mHisto.saveHistograma();
+	MiVocabulario mVocabu(NCLUSTER, _centers.cols, " TODOS"); //nameImage.substr(nameImage.find_last_of(" "), nameImage.size()));
+	time(&_initTime);
+	rellenaMiVocabulario(mVocabu);
+	time(&_endTime);
+	mVocabu.imprimeVocabulario();
+	mVocabu.saveVocabulary();
+	//mVocabu.saveVocabulario();
+	std::cout << "HA TARDADO: " << (_endTime - _initTime) << std::endl;
 
 	eliminaVectorImagen();
 	eliminaVectorPuntos();
@@ -129,16 +129,22 @@ int cuentaImagenes(char* nomFich)
 	std::string linea;
 	int totalImagenes = 0, totalRutas = 0;
 	
+	int posicion = 0;
+	char basura;
 	while(!fich.eof())
 	{
+		if (posicion != 0) fich.seekg(posicion, fich.beg);
 		getline(fich, linea);
 		if (!linea.find("/")) totalRutas++;
 		else totalImagenes++;
+		posicion = fich.tellg();
+		fich >> basura;
 	}
 
 	fich.close();
+	std::cout << "TOTAL IMAGENES SIN RESTAR: " << totalImagenes << "TOTAL RUTAS: " << totalRutas << 	std::endl;
 
-	return totalImagenes -  totalRutas;
+	return totalImagenes;
 }
 
 
@@ -222,7 +228,7 @@ void rellenaVectorPuntos(int fila, int f, int c, cv::Mat data)
 	data.at<float>(fila, 8) = _vPoints[fila][8] = _vImage[f + 1][c + 1];
 }
 
-void rellenaMiHistograma(MiHistograma &mh)
+void rellenaMiVocabulario(MiVocabulario &mv)
 {
 	for (int i = 0; i < _centers.rows; i++)
 	{
@@ -230,12 +236,12 @@ void rellenaMiHistograma(MiHistograma &mh)
 		for (int j = 0; j < _centers.cols; j++)
 		{
 			vCoordenadas[j] = _centers.at<float>(i,j);
-			//mh.getCluster(i).centroide.at<float>(j) = _centers.at<float>(i,j);
+			//mv.getCluster(i).centroide.at<float>(j) = _centers.at<float>(i,j);
 		}
-		mh.setCoordenadasCentroide(i, vCoordenadas);
+		mv.setCoordenadasCentroide(i, vCoordenadas);
 	}
-	for (int i = 0; i < _vCluster.rows; i++)
-		mh.setTotalPuntos(_vCluster.at<ushort>(i), mh.getCluster(_vCluster.at<ushort>(i)).getTotalPuntos() + 1);
+	//for (int i = 0; i < _vCluster.rows; i++)
+	//	mv.setTotalPuntos(_vCluster.at<ushort>(i), mv.getCluster(_vCluster.at<ushort>(i)).getTotalPuntos() + 1);
 	std::cout << "HISTOGRAMA RELLENO" << std::endl;
 }
 

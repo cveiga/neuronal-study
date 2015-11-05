@@ -13,17 +13,18 @@ private:
 	{ 
 		for (int i = 0; i < 9; i++)
 			ar & centroide[i];
-		ar & total_puntos;
+		//ar & total_puntos;
 	}
 
 	/*cv::Mat*/float* centroide;
-	int total_puntos;	
+	//int total_puntos;	
 
 public:
-	Cluster(): total_puntos(0) {}
-	Cluster(int num_coordenadas): total_puntos(0) { centroide = new float[num_coordenadas]; } /*centroide = (1, num_coordenadas, CV_32FC1);*/
-	int getTotalPuntos() const { return total_puntos; }
-	void setTotalPuntos(const int tp) { total_puntos = tp; }
+	//Cluster(): total_puntos(0) {}
+	Cluster(){}
+	Cluster(int num_coordenadas)/*: total_puntos(0) */{ centroide = new float[num_coordenadas]; } /*centroide = (1, num_coordenadas, CV_32FC1);*/
+	//int getTotalPuntos() const { return total_puntos; }
+	//void setTotalPuntos(const int tp) { total_puntos = tp; }
 	float* getCoordenadasCentroide() const { return centroide; }
 	void setCoordenadasCentroide(const float vectorCoordenadas[]) 
 	{
@@ -48,7 +49,7 @@ std::ostream & operator<<(std::ostream &os, const Cluster &cl)
 	for (int i = 0; i < 9; i++)
 			os << cl.centroide[i];
 		
-    return os << cl.total_puntos;
+    return os; //<< cl.total_puntos;
 }
 
 #endif
