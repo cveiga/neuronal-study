@@ -178,9 +178,9 @@ void rellenaVectorPuntos(int fila, int f, int c)
 
 void calculaHistograma(int *miHistograma, int filas)
 {
-	std::cout << "Calculando histograma de la imagen... " << std::endl;		// << image << "..." << std::endl;
+	std::cout << "Calculando histograma de la imagen... " << std::endl;
 	for (int i = 0; i < filas; ++i)	//cada uno de los f filas de la imagen de Training
-	{ 		//coordenadas de cada uno de los 100 centroides de la imagen de Test
+	{ 	//coordenadas de cada uno de los 100 centroides de la imagen de Test
 		//float *centroideTest = mVocabuTest.getCluster(i).getCoordenadasCentroide();
 		double resultado = 0;
 		int min = -1;
@@ -188,16 +188,13 @@ void calculaHistograma(int *miHistograma, int filas)
 		for (int j = 0; j < NCLUSTERS; j++)	//cada uno de los 1000 clusters del vocabulario
 		{ 		//coordenadas de cada uno de los 1000 centroides de la imagen de Test
 			float *coordenadasCentroide = _vocabulario.getCluster(j).getCoordenadasCentroide();
-			for (int k = 0; k < NCOORDENADAS; k++) resultado += pow(_vPoints[i][k] - coordenadasCentroide[k], 2);
-					//+= pow(_vPoints[i][k] - Point_Q[j][k], 2);				
+			for (int k = 0; k < NCOORDENADAS; k++) resultado += pow(_vPoints[i][k] - coordenadasCentroide[k], 2);			
 			resultado = sqrt(resultado);
-			//////////////////////////////////////////////////////////////////////////////////////////////////
-			//std::cout << "RESULTADO: " << resultado << ", MINIMO: " << min << ", POSICION: " << colocarEn << std::endl;			
+			//////////////////////////////////////////////////////////////////////////////////////////////////			
 			if ( resultado <= min or min == -1)
 			{
 				min = resultado;
 				colocarEn = j;
-				//std::cout << "colocar en: " << i << std::endl;
 			}
 		}
 		miHistograma[colocarEn] += 1;

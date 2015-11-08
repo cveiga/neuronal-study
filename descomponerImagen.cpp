@@ -94,7 +94,6 @@ int main (int argc, char* argv[])
 		posicion = fich.tellg();
 		fich >> basura;
 	}
-	//std::cout << "Total De Totales: " << mVocabu.getTotaltes() << std::endl;
 
 	fich.close();
 
@@ -240,8 +239,6 @@ void rellenaMiVocabulario(MiVocabulario &mv)
 		}
 		mv.setCoordenadasCentroide(i, vCoordenadas);
 	}
-	//for (int i = 0; i < _vCluster.rows; i++)
-	//	mv.setTotalPuntos(_vCluster.at<ushort>(i), mv.getCluster(_vCluster.at<ushort>(i)).getTotalPuntos() + 1);
 	std::cout << "HISTOGRAMA RELLENO" << std::endl;
 }
 
