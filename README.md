@@ -14,8 +14,8 @@ For run program:
 
 File Index:
  - Cluster.h 			 -> class cluster, has a float array. This array stores all dimensions of the centroids for each cluster
+ - compareHistograma.cpp -> it compares the minimum distance from two histograms
  - descomponerImagen.cpp -> it generates the vocabulary using all images of training
- - euclideanSize.cpp 	 -> it compares the minimum distance from two histograms
  - generaHistograma.cpp  -> it generates the histogram for each image using the previusly vocabulary calculated
  - head.h 				 -> common libraries
  - MiVocabulario.h 		 -> class vocabulary, has a clusters array. It stores type name of the image and number of clusters and 						   dimensions

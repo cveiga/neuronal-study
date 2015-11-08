@@ -20,7 +20,6 @@ void rellenaVectorPuntos(int fila, int f, int c);
 void calculaHistograma(int*, int);
 void imprimeHistograma(int*);
 void guardaHistograma(int*, std::string &);
-void leerHistograma(int*, std::string &);
 bool seguridad(int argc, char* argv[])
 {
 	if (argc < 3) 
@@ -56,7 +55,6 @@ int main(int argc, char* argv[])
 	char basura;
 	int miHistograma[NCLUSTERS];
 
-	//bool continuar = true;
 	while(!_fichImagenes.eof()) 
 	{ 
 		if (posicion != 0) _fichImagenes.seekg(posicion, _fichImagenes.beg);
@@ -181,13 +179,13 @@ void calculaHistograma(int *miHistograma, int filas)
 	std::cout << "Calculando histograma de la imagen... " << std::endl;
 	for (int i = 0; i < filas; ++i)	//cada uno de los f filas de la imagen de Training
 	{ 	//coordenadas de cada uno de los 100 centroides de la imagen de Test
-		//float *centroideTest = mVocabuTest.getCluster(i).getCoordenadasCentroide();
 		double resultado = 0;
 		int min = -1;
 		int colocarEn = 0;
 		for (int j = 0; j < NCLUSTERS; j++)	//cada uno de los 1000 clusters del vocabulario
-		{ 		//coordenadas de cada uno de los 1000 centroides de la imagen de Test
+		{ 	//coordenadas de cada uno de los 1000 centroides de la imagen de Test
 			float *coordenadasCentroide = _vocabulario.getCluster(j).getCoordenadasCentroide();
+			///////////////////////////////// DISTANCIA EUCLIDEA /////////////////////////////////////////////	
 			for (int k = 0; k < NCOORDENADAS; k++) resultado += pow(_vPoints[i][k] - coordenadasCentroide[k], 2);			
 			resultado = sqrt(resultado);
 			//////////////////////////////////////////////////////////////////////////////////////////////////			
@@ -220,21 +218,6 @@ void guardaHistograma(int *miHistograma, std::string &img)
 	    // Se crea un archivo de salida
 	    std::ofstream ofs("HistogramasImagens.txt", std::ios::app);
 	    boost::archive::text_oarchive ar(ofs);
-
-	    // Escribe el nombre de la imagen, el tipo al que pertenece y su histograma
-	    ar & img & tipo;
-	    for (int i = 0; i < NCLUSTERS; i++) { ar & miHistograma[i]; }
-	}
-}
-
-void leerHistograma(int *miHistograma, std::string &img)
-{
-	std::string tipo;
-	//Leer el histograma
-	{		
-	    // Se abre un archivo de lectura
-	    std::ifstream ifs("HistogramasImagens.txt");
-	    boost::archive::text_iarchive ar(ifs);
 
 	    // Escribe el nombre de la imagen, el tipo al que pertenece y su histograma
 	    ar & img & tipo;
