@@ -49,7 +49,7 @@ class MiVocabulario : public Cluster
 		bool saveVocabulary(){
 			//creo y abro un fichero de caracteres para la salida
 			//std::ofstream ofs("filename.dat", std::ios::binary);
-			std::ofstream ofs("pruebaGuardar.txt", std::ios::app);	//abre con cursor a final de fichero
+			std::ofstream ofs("vocabularioTotal.txt", std::ios::app);	//abre con cursor a final de fichero
 			ofs << tipo.substr(1, tipo.size()) << std::endl;
 			boost::archive::text_oarchive oa(ofs);
 			//escriblo la instancia de la clase en el archivo

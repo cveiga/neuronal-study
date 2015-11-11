@@ -1,4 +1,5 @@
 #include <MiVocabulario.h>
+#include <time.h>
 
 #define NCLUSTERS 1000
 #define NCOORDENADAS 9
@@ -54,7 +55,9 @@ int main(int argc, char* argv[])
 	long posicion = 0;
 	char basura;
 	int miHistograma[NCLUSTERS];
+	time_t initTime, currentTime;
 
+	time(&initTime);
 	while(!_fichImagenes.eof()) 
 	{ 
 		if (posicion != 0) _fichImagenes.seekg(posicion, _fichImagenes.beg);
@@ -83,6 +86,7 @@ int main(int argc, char* argv[])
 		_fichImagenes >> basura;
 	}
 	_fichImagenes.close();
+	std::cout << "Ha tardado: " << time(&currentTime) - initTime << " Segundos" << std::endl;
 
 	return 1;
 }
@@ -211,12 +215,18 @@ void imprimeHistograma(int *miHistograma)
 
 void guardaHistograma(int *miHistograma, std::string &img)
 {
-	std::string tipo = img.substr(img.find_last_of(" "), img.size());
-	tipo = tipo.substr(1, tipo.size() - 4);
+	std::string tipo;
+	if(img.find("NO CONDICIONADO") != std::string::npos) tipo = "NO CONDICIONADO";
+	else if(img.find("NO EMPAREJADO") != std::string::npos) tipo = "NO EMPAREJADO";
+	else 
+	{
+		tipo = img.substr(img.find_last_of(" "), img.size());
+		tipo = tipo.substr(1, tipo.size() - 4);
+	}
 	//Salvar el histograma
 	{		
 	    // Se crea un archivo de salida
-	    std::ofstream ofs("HistogramasImagens.txt", std::ios::app);
+	    std::ofstream ofs("HistogramasImagenesTest.txt", std::ios::app);
 	    boost::archive::text_oarchive ar(ofs);
 
 	    // Escribe el nombre de la imagen, el tipo al que pertenece y su histograma

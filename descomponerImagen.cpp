@@ -96,11 +96,11 @@ int main (int argc, char* argv[])
 	}
 
 	fich.close();
-
+	std::cout << "Calculando Clusters..." << std::endl;
+	time(&_initTime);
 	double compactness = cv::kmeans(data, NCLUSTER, _vCluster, cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 10, 0.01), 3, cv::KMEANS_PP_CENTERS, _centers);
 
 	MiVocabulario mVocabu(NCLUSTER, _centers.cols, " TODOS"); //nameImage.substr(nameImage.find_last_of(" "), nameImage.size()));
-	time(&_initTime);
 	rellenaMiVocabulario(mVocabu);
 	time(&_endTime);
 	mVocabu.imprimeVocabulario();
