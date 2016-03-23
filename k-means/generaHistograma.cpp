@@ -1,4 +1,4 @@
-#include <MiVocabulario.h>
+#include <k-means/MiVocabulario.h>
 #include <time.h>
 
 #define NCLUSTERS 1000
@@ -111,7 +111,7 @@ void leeImagen(std::string &img)
 	getline(_fichImagenes, img);
 	if (!img.find("/"))
 	{
-		_ruta = "../" + img.substr(img.find("IMG"), img.length()) + "/";
+		_ruta = "../../" + img.substr(img.find("IMG"), img.length()) + "/";
 		getline(_fichImagenes, img);
 	}
 	img = _ruta + img;
@@ -134,7 +134,19 @@ void creaVectorPuntos(int fila, int columna)
 
 void rellenaVectorImagen()
 {
-	ushort numerito;
+
+	for (int fila = 0; fila < _img.size().height; fila++)
+	{
+		for (int columna = 0; columna < _img.size().width; columna++)
+		{
+			cv::Vec3b intensity = _img.at<cv::Vec3b>(fila, columna);
+			ushort red = intensity.val[2];							//openCv usa BGR, por lo tanto, nos quedamos con la banda que nos interesa, la Roja
+			
+			_vImage[fila][columna] = red;
+		}
+	}
+
+	/*ushort numerito;
 	int columna = 1;
 	int mostrado = 0;
 	int j = 0;
@@ -144,7 +156,7 @@ void rellenaVectorImagen()
 		if (mostrar)
 		{
 			for(int fila = 0; fila < _img.rows; fila++)
-				_vImage[fila][j] = _img.at<ushort>(fila, columna) < 256 ? _img.at<ushort>(fila, columna) : _img.at<ushort>(fila, columna)/256;   /**normalización de datos fuera del rango de 0 a 255 */
+				_vImage[fila][j] = _img.at<ushort>(fila, columna) < 256 ? _img.at<ushort>(fila, columna) : _img.at<ushort>(fila, columna)/256;   //normalización de datos fuera del rango de 0 a 255 
 
 			j++;
 			columna++;
@@ -160,7 +172,7 @@ void rellenaVectorImagen()
 		if (mostrado >= 400) break;		
 		if (cont < 1) mostrar = true;
 		cont++;
-	}
+	}*/
 }
 
 /** En esta función se almacenan el valor de cada uno de los puntos de 9 pixeles resultantes 
@@ -226,7 +238,7 @@ void guardaHistograma(int *miHistograma, std::string &img)
 	//Salvar el histograma
 	{		
 	    // Se crea un archivo de salida
-	    std::ofstream ofs("HistogramasSalinaConndicionadoTest.txt", std::ios::app);
+	    std::ofstream ofs("HistogramasSinNoEmparejadoTest.txt", std::ios::app);
 	    boost::archive::text_oarchive ar(ofs);
 
 	    // Escribe el nombre de la imagen, el tipo al que pertenece y su histograma

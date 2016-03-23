@@ -18,7 +18,7 @@ std::string leerImagen(std::ifstream &fich, std::string &ruta, std::string &imag
 void creaVectorImagen(int fila, int columna);
 void creaVectorPuntos(int fila, int columna);
 void rellenaVectorImagen();
-void rellenaVectorPuntos(int fila, int f, int c, cv::Mat);
+void rellenaVectorPuntos(int fila, int f, int c, cv::Mat &);
 void rellenaMiVocabulario(MiVocabulario &mv);
 void imprimeVectorImagen();
 void imprimeVCluster();
@@ -63,7 +63,7 @@ int main (int argc, char* argv[])
 
 		//cv::namedWindow(imagen.substr(0, imagen.size()-4), cv::WINDOW_AUTOSIZE);
 		
-		const std::string & path = "../" + ruta.substr(ruta.find("IMG"), ruta.length()) + "/" + imagen;
+		const std::string & path = "../../" + ruta.substr(ruta.find("IMG"), ruta.length()) + "/" + imagen;
 		std::cout << "PATH: " << path << std::endl;
 
 		_img = cv::imread(path, cv::IMREAD_ANYCOLOR | cv::IMREAD_ANYDEPTH);
@@ -181,7 +181,19 @@ void creaVectorPuntos(int fila, int columna)
 
 void rellenaVectorImagen()
 {
-	ushort numerito;
+
+	for (int fila = 0; fila < _img.size().height; fila++)
+	{
+		for (int columna = 0; columna < _img.size().width; columna++)
+		{
+			cv::Vec3b intensity = _img.at<cv::Vec3b>(fila, columna);
+			ushort red = intensity.val[2];							//openCv usa BGR, por lo tanto, nos quedamos con la banda que nos interesa, la Roja
+			
+			_vImage[fila][columna] = red;
+		}
+	}
+
+	/*ushort numerito;
 	int columna = 1;
 	int mostrado = 0;
 	int j = 0;
@@ -193,7 +205,7 @@ void rellenaVectorImagen()
 			for(int fila = 0; fila < _img.rows; fila++)
 				_vImage[fila][j] = _img.at<ushort>(fila, columna) < 256 ? _img.at<ushort>(fila, columna) : _img.at<ushort>(fila, columna)/256;   /**normalización de datos fuera del rango de 0 a 255 */
 
-			j++;
+			/*j++;
 			columna++;
 			mostrado++;
 			//std::cout << std::endl;
@@ -210,11 +222,11 @@ void rellenaVectorImagen()
 		if (mostrado >= 400) break;		
 		if (cont < 1) mostrar = true;
 		cont++;
-	}std::cout << "SALIMOS" << std::endl;
+	}std::cout << "SALIMOS" << std::endl;*/
 }
 
 /** En esta función se almacenan el valor de cada uno de los puntos de 9 pixeles resultantes de aplicar una mascara de 3x3 */
-void rellenaVectorPuntos(int fila, int f, int c, cv::Mat data)
+void rellenaVectorPuntos(int fila, int f, int c, cv::Mat &data)
 {	
 	data.at<float>(fila, 0) = _vPoints[fila][0] = _vImage[f - 1][c - 1];
 	data.at<float>(fila, 1) = _vPoints[fila][1] = _vImage[f - 1][c];

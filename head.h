@@ -22,3 +22,5 @@
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/list.hpp>
 #include <boost/serialization/assume_abstract.hpp>
+
+#include "k-means/MiVocabulario.h"
