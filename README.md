@@ -17,5 +17,6 @@ File Index:
  - compareHistograma.cpp -> it compares the minimum distance from two histograms
  - descomponerImagen.cpp -> it generates the vocabulary using all images of training
  - generaHistograma.cpp  -> it generates the histogram for each image using the previusly vocabulary calculated
+ - wilsonAlgorithm.cpp   -> After to generate training, this algorithm clear the samples than do not match themselves
  - head.h 				 -> common libraries
  - MiVocabulario.h 		 -> class vocabulary, has a clusters array. It stores type name of the image and number of clusters and 						   dimensions
