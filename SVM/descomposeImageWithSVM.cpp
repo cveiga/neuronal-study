@@ -3,24 +3,12 @@
 
 #define NCLUSTERS 1000
 
-ushort ** _vImage = NULL;
-int ** _vPoints = NULL;
-float * _vLabeles = NULL;
-
-cv::Mat _vCluster;
-cv::Mat _img;
-cv::Mat _centers;
-
 int _numeroImagenes;
 time_t _initTime, _endTime;
 
 std::string leerHistograma(int*, std::string &, std::ifstream &);
 int cuentaImagenes(char* nomFich);
-void creaVectorPuntos(int fila, int columna);
-void creaVectorEtiquetas(int);
-void rellenaVectorPuntos(int, int*);
 void imprimeVCluster();
-void eliminaVectorPuntos();
 bool seguridad(int argc, char* argv[], std::ifstream &fichTest)
 {
 	if (argc < 2) 
@@ -57,21 +45,31 @@ int main (int argc, char* argv[])
 	std::string imagen;
 	std::string nameImage;
 
+	cv::Mat samples;
+	cv::Mat labelesMat(0, 1, CV_32FC1);
+
 	long posicion = 0;
 	char basura;
 	int filaVector = 0;
+	int imagenNum = 0;
 
 	while (!fich.eof()){
+		float label;
 		if (posicion != 0) fich.seekg(posicion, fich.beg);
-		
-		if (_vPoints == NULL) creaVectorPuntos(_numeroImagenes, NCLUSTERS);
-		if (_vLabeles == NULL) creaVectorEtiquetas(_numeroImagenes);
 
 		std::string tipoTraining = leerHistograma(boWTraining, nameImage, fich);
-		_vLabeles[filaVector] = tipoTraining == "CONDICIONADO." ? 1.0 : -1.0;
+		cv::Mat imgDescriptor(NCLUSTERS, 1, CV_8U, boWTraining); 
 
-		rellenaVectorPuntos(filaVector++, boWTraining);
+		if(tipoTraining.compare("SALINA.") == 0) label = -1.0;
+		if(tipoTraining.compare("NO CONDICIONADO") == 0) label = 0.0;
+		if(tipoTraining.compare("CONDICIONADO.") == 0) label = 1.0;
+		labelesMat.push_back(label);
 
+		if(samples.empty()) samples.create(_numeroImagenes, NCLUSTERS, CV_32F);
+		//samples.push_back(imgDescriptor);
+		for (int j = 0; j < NCLUSTERS; j++)	samples.at<float>(imagenNum, j) = boWTraining[j];	
+		imagenNum++;
+		
 		posicion = fich.tellg();
 		fich >> basura;
 	}
@@ -79,38 +77,43 @@ int main (int argc, char* argv[])
 	fich.close();
 
 std::cout << "EXTRACCIÓN DE PUNTOS FINALIZADA" << std::endl;
+std::cout << "TAMAÑO DE LOS DESCRIPTORES: " << samples.size() << ", y de las ETIQUETAS: " << labelesMat.size() << std::endl;
 
-	cv::Mat labelesMat(_numeroImagenes, 1, CV_32FC1, _vLabeles);
-std::cout << "CREACION TRAININGDATAMAT" << std::endl;
-	cv::Mat trainingDataMat = cv::Mat::zeros(_numeroImagenes, NCLUSTERS, CV_32FC1);
-	for (int i = 0; i < _numeroImagenes; i++)
-	{
-		for (int j = 0; j < NCLUSTERS; j++)	trainingDataMat.at<float>(i, j) = _vPoints[i][j];	
-	}
-	//cv::Mat trainingDataMat(_numeroImagenes, NCLUSTERS, CV_32FC1, _vPoints);
-std::cout << "TOTAL DE BoW: " << _numeroImagenes << std::endl;
 	//Set up SVM's parameters
 	CvSVMParams params;
-	params.svm_type = CvSVM::C_SVC;
-	params.kernel_type = CvSVM::LINEAR;
-	params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER, 100, 1e-6);
+	params.svm_type 	= CvSVM::C_SVC;
+	params.degree 		= 0.4;
+    params.gamma 		= 1;
+    params.coef0 		= 0;
+
+    params.nu 			= 0.0;
+    params.p 			= 2;
+	params.C 			= std::numeric_limits<double>::infinity();
+	params.kernel_type 	= CvSVM::LINEAR;	//CvSVM::RBF;
+	params.term_crit 	= cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, /*1000000*/(int)1e7, /*1e-6*/FLT_EPSILON);
+
+	cv::Mat samples_32f;
+	samples.convertTo(samples_32f, CV_32F);
 
 	//Train the SVM
 	CvSVM SVM;
 std::cout << "EJECUCIÓN TRAINING SVM" << std::endl;
-	//cv::Mat response(((_img.rows - 1) * (_img.cols - 1) * _numeroImagenes), 1, CV_32SC1);
+
 	time(&_initTime);
-	std::cout << "Training to SVM..." << std::endl;
-	SVM.train(trainingDataMat, labelesMat, cv::Mat(), cv::Mat(), params);
+std::cout << "Training to SVM..." << std::endl;
+	SVM.train(samples_32f, labelesMat, cv::Mat(), cv::Mat(), params);
 
 	time(&_endTime);
 
-	SVM.save("SVM_TrainingBoW3.txt");
+	SVM.save("SVM_TrainingBoW_Wilson3.txt");
 
-	std::cout << "HA TARDADO: " << (_endTime - _initTime) << std::endl;
+std::cout << "HA TARDADO: " << (_endTime - _initTime) << std::endl;
 
-	eliminaVectorPuntos();
-	delete[] _vLabeles;
+	for (int i = 0; i < _numeroImagenes; i++)
+	{
+		std::cout << labelesMat.at<float>(0,i) << "," ;
+		if(i % 10 == 0) std::cout << std::endl;
+	}std::cout << std::endl;
 
 	return 0;
 }
@@ -167,29 +170,4 @@ int cuentaImagenes(char* nomFich)
 	std::cout << "TOTAL BOLSA DE PALABRAS: " << totalImagenes << 	std::endl;
 
 	return totalImagenes;
-}
-
-void creaVectorPuntos(int fila, int columna)
-{  std::cout << "VECTOR PUNTOS: " << std::endl << "FILAS: " << fila << ", COLUMNAS: " << columna << std::endl;
-	_vPoints = new int*[fila];
-	for (int i = 0; i < fila; i++)
-		_vPoints[i] = new int[columna];
-}
-
-void creaVectorEtiquetas(int fila)
-{  std::cout << "VECTOR ETIQUETAS: " << std::endl << "FILAS: " << fila << std::endl;
-	_vLabeles = new float[fila];
-}
-
-/** En esta función se almacenan el valor de cada uno de las palabras para cada una de las imágenes */
-void rellenaVectorPuntos(int fila, int *miHistograma)
-{	
-	for (int i = 0; i < NCLUSTERS; i++)	_vPoints[fila][i] = miHistograma[i];
-}
-
-void eliminaVectorPuntos()
-{
-	for (int i = 0; i < _numeroImagenes; i++)
-		delete[] _vPoints[i];
-	delete[] _vPoints;
 }

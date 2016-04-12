@@ -2,20 +2,15 @@
 
 #define NCLUSTERS 1000
 
-ushort ** _vImage = NULL;
-ushort ** _vPoints = NULL;
+ushort _tCondicionados = 0, _tResto = 0;
 
 std::string _fichTrainig;
 int _hisTest[NCLUSTERS];
 std::string _imageTest;
 cv::Mat _img;
-//MiVocabulario _vocabulario(NCLUSTERS, NCOORDENADAS);
 
-//std::string _ruta;
-
-//void leeImagen(std::string &img);
 std::string leerHistograma(std::ifstream &);
-void clasificaImagen();
+void clasificaImagen(std::string);
 bool seguridad(int argc, char* argv[], std::ifstream &fichTest)
 {
 	if (argc < 3) 
@@ -41,10 +36,8 @@ int main(int argc, char* argv[])
 	std::ifstream fichTest;
 	if (!seguridad(argc, argv, fichTest)) return 0;
 
-	//std::string image;
 	long posicion = 0;
 	char basura;
-	//int miHistograma[NCLUSTERS];
 	time_t initTime, currentTime;
 
 	time(&initTime);
@@ -53,13 +46,15 @@ int main(int argc, char* argv[])
 		if (posicion != 0) fichTest.seekg(posicion, fichTest.beg);
 		std::string tipoTest = leerHistograma(fichTest);
 
-		clasificaImagen();
+		clasificaImagen(tipoTest);
 
 		posicion = fichTest.tellg();
 		fichTest >> basura;
 	}
 	fichTest.close();
 	std::cout << "Ha tardado: " << time(&currentTime) - initTime << " Segundos" << std::endl;
+
+	std::cout << "TOTAL: CONDICIONADOS = " << _tCondicionados << " | RESTO = " << _tResto << std::endl;
 
 	return 1;
 }
@@ -85,41 +80,22 @@ std::string leerHistograma(std::ifstream &ifs)
 	return tipo;
 }
 
-void clasificaImagen()
+/**
+*Clasificar una imagen
+*@parametro tipo, tipo de la imagen de test
+*@parametro _hisTest, histograma de la imagen de test
+*/
+void clasificaImagen(std::string tipo)
 {
 	int result[] = {0,0};
 
 	CvSVM SVM;
 	SVM.load(_fichTrainig.c_str());
-
-	/*for (int i = 0; i < _img.rows - 1; i++)
-		{ 
-			cv::Mat sample(1, 9, CV_32FC1, _vPoints[i]);
-			for (int j = 0; j < _img.cols -1; j++)
-			{
-				float response = SVM.predict(sample);
-
-				response == 0 ? result[0]++ : result[1]++;
-				//std::cout << response == 1 ? "OTRO" : "CONDICIONADO" << std::endl;
-				//std::cout << '[' << response << ']' << '\t';
-				//std::cout << std::string(response == 1 ? "OTRO" : "CONDICIONADO") << std::endl;
-			}
-	}*/
-	cv::Mat response (1,1,CV_32F);
-	//for (int i = 0; i < NCLUSTERS; i++)
-	//{
+	
 	cv::Mat sample(NCLUSTERS, 1, CV_32FC1, _hisTest);
-	response = SVM.predict(sample);
+	float response = SVM.predict(sample);
 
-	for (int i = 0; i < NCLUSTERS; i++)
-	{
-		response.at<float>(i) == 0 ? result[0]++ : result[1]++;
-		//if (response != -1)	
-			//std::cout << "[" << response.at<float>(i) << "]  ";
-	}
-	//}
-
-	std::cout << "RESULTADO: " << result[0] << " | " << result[1];
-	if (result[0] > result[1]) std::cout << "--> SALINA" << std::endl;
-	else std::cout << "--> CONDICIONADO" << std::endl;
+	std::cout << tipo << " --> RESULTADO: ";
+	response != 1 ? std::cout << "OTRO" : std::cout << "CONDICIONADO" ;
+	std::cout << std::endl;
 }
