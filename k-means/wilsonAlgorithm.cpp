@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 			std::cerr << "No se ha podido abrir el fichero de imágenes de Training" << std::endl;
 			return false;
 		}
-
+		//it->img = "../" + it->img;
 		std::cout << "Calculando tipo de la imagen: " << it->img << std::endl;
 		long posicionTraining = 0, countTraining = 0;
 		while( !fichTraining.eof() )
@@ -104,26 +104,24 @@ int main(int argc, char *argv[])
 		fichTraining.close();
 		perteneceKVecinos = votaVecino(vecinosMasProximos);
 
+
 		if(it->tipo != perteneceKVecinos) 
 		{
 			listHistCandidate.erase(it++);
 			noMatch++;
 		}
-		else{
-			positionCandidate++;
-
-			if (++it == listHistCandidate.end())
-			{
-				usleep(2000);
-				if(noMatch < LIMITMATCHES) break;
-				it = listHistCandidate.begin();
-				noMatch = positionCandidate = 0;
-			}
-		}
+		else it++;
+		if (it == listHistCandidate.end())
+		{
+			if(noMatch < LIMITMATCHES) break;	
+			it = listHistCandidate.begin();
+			noMatch = positionCandidate = 0;
+		} 
 		
 		//std::cout << "El Candidate: " << tipoCandidate << ", y el resultado por Coincidencias es: " /*<< pertenece << ", y por Proximidad es: "*/ << perteneceEuclidea << std::endl;
 		//std::cout << "El Candidate: " << it->tipo << ", y el resultado por Coincidencias es: " << perteneceKVecinos << std::endl;
 	}
+std::cout << "VAMOS A GUARDAR LOS DATOS:" << std::endl;
 	for(it = listHistCandidate.begin(); it != listHistCandidate.end(); it++)
 		guardaHistograma(it->hisCandidate, it->img); ////////////////////ESCRIBIMOS EL HISTOGRAMA EN EL NUEVO FICHERO PARA WILSON ALGORITHM////////////////
 
@@ -306,7 +304,7 @@ void guardaHistograma(int *miHistograma, std::string &img)
 	//Salvar el histograma
 	{		
 	    // Se crea un archivo de salida
-	    std::ofstream ofs("NUEVO_WILSON_K5_N-Iteracaciones.txt", std::ios::app);
+	    std::ofstream ofs("WilsonK5TestConYNoCon.txt", std::ios::app);
 	    boost::archive::text_oarchive ar(ofs);
 
 	    // Escribe el nombre de la imagen, el tipo al que pertenece y su histograma
